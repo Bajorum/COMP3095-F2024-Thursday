@@ -18,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
+
     private final ProductRepository productRepository;
     private final MongoTemplate mongoTemplate;
 
@@ -32,21 +33,25 @@ public class ProductServiceImpl implements ProductService {
                 .price(productRequest.price())
                 .build();
 
+        //persist a product
         productRepository.save(product);
 
         log.info("Product {} is saved", product.getId());
 
         return new ProductResponse(product.getId(), product.getName(),
                 product.getDescription(), product.getPrice());
+
     }
 
     @Override
     public List<ProductResponse> getAllProducts() {
 
-        log.debug("Returning a list of products");
+        log.debug("Returning a list products");
         List<Product> products = productRepository.findAll();
 
-        return products.stream().map(this::mapToProductResponse).toList();
+        //return products.stream().map(product -> mapToProductResponse(product)).toList();
+        return products.stream().map(this:: mapToProductResponse).toList();
+
     }
 
     private ProductResponse mapToProductResponse(Product product) {
@@ -57,26 +62,31 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public String updateProduct(String productId, ProductRequest productRequest) {
 
-        log.debug("Updating a product with id {}", productId);
+       log.debug("Updating a product with id {}", productId );
 
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(productId));
-        Product product = mongoTemplate.findOne(query, Product.class);
+       Query query = new Query();
+       query.addCriteria(Criteria.where("id").is(productId));
+       Product product = mongoTemplate.findOne(query, Product.class);
 
-        if (product != null) {
-            product.setDescription(productRequest.description());
-            product.setPrice(productRequest.price());
-            product.setName(productRequest.name());
-            return productRepository.save(product).getId();
-        }
 
-        return productId;
+       if(product != null) {
+
+           product.setDescription(productRequest.description());
+           product.setPrice(productRequest.price());
+           product.setName(productRequest.name());
+           return productRepository.save(product).getId();
+       }
+
+       return productId;
+
     }
 
     @Override
-    public void deleteProduct(String Id) {
+    public void deleteProduct(String productId) {
 
-        log.debug("Deleting a product with id {}", Id);
-        productRepository.deleteById(Id);
+        log.debug("Deleting a product with id {}", productId);
+        productRepository.deleteById(productId);
+
+
     }
 }

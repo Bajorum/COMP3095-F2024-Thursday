@@ -1,4 +1,5 @@
 package ca.gbc.productservice.model;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +23,5 @@ public class Product {
     private BigDecimal price;
 
 }
+
 
